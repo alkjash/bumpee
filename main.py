@@ -10,6 +10,18 @@ green    = (   0, 255,   0)
 red      = ( 255,   0,   0)
 blue     = (   0,   0, 255)
 
+# Movement keys by turn
+move_dict = {
+        (pygame.K_w,     1) : ( 0, -1),
+        (pygame.K_a,     1) : (-1,  0),
+        (pygame.K_s,     1) : ( 0,  1),
+        (pygame.K_d,     1) : ( 1,  0),
+        (pygame.K_UP,    2) : ( 0, -1),
+        (pygame.K_LEFT,  2) : (-1,  0),
+        (pygame.K_DOWN,  2) : ( 0,  1),
+        (pygame.K_RIGHT, 2) : ( 1,  0)
+            }
+
 # --------- Initialize Board State ----------
 pygame.init()
 
@@ -35,29 +47,33 @@ pygame.display.set_caption("Bumpee")
 # Used to manage how fast the screen updates
 clock=pygame.time.Clock()
 
-# Loop until the user clicks the close button.
+# Loop until the user clicks the close button
+# or all blocks are placed
 done = False
 
 # Alternate between 1 and 2
 turn = 1
 
-# Movement keys by turn
-move_dict = {
-        (pygame.K_w,     1) : ( 0, -1),
-        (pygame.K_a,     1) : (-1,  0),
-        (pygame.K_s,     1) : ( 0,  1),
-        (pygame.K_d,     1) : ( 1,  0),
-        (pygame.K_UP,    2) : ( 0, -1),
-        (pygame.K_LEFT,  2) : (-1,  0),
-        (pygame.K_DOWN,  2) : ( 0,  1),
-        (pygame.K_RIGHT, 2) : ( 1,  0)
-            }
-
-# Construct a cursor block
-cursor = block.Block(white, 0, 0, 0)
-
 # construct boundary rectangle for current cursor
 boundary = [0, 0, board.width() / 2, board.length()]
+
+# Queue of blocks to place
+block_Q = [
+        block.Block.Engine,
+        block.Block.Left,
+        block.Block.Up,
+        block.Block.Right,
+        block.Block.Down,
+        block.Block.Basic,
+        block.Block.Basic,
+        block.Block.Basic,
+        block.Block.Basic,
+        block.Block.Basic,
+          ]
+cur_block = 0
+
+# Construct a cursor block
+cursor = block.Block(white, block_Q[cur_block], 0, 0)
 
 while done == False:
     # handle user keystroke
@@ -77,18 +93,23 @@ while done == False:
             # check for end turn: move cursor and boundary accordingly
             elif (key, turn) == (pygame.K_LSHIFT, 1):
                 (x, y) = cursor.pos()
-                if not board.place(0, turn, x, y):
+                if not board.place(block_Q[cur_block], turn, x, y):
                     break
                 turn = 2
-                cursor = block.Block(white, 0, board.width()/2, 0)
+                cursor = block.Block(white, block_Q[cur_block], board.width()/2, 0)
                 boundary = [board.width() / 2, 0, board.width() / 2, board.length()]
             elif (key, turn) == (pygame.K_RETURN, 2):
                 (x, y) = cursor.pos()
-                if not board.place(0, turn, x, y):
+                if not board.place(block_Q[cur_block], turn, x, y):
                     break
                 turn = 1
-                cursor = block.Block(white, 0, 0, 0)
-                boundary = [0, 0, board.width() / 2, board.length()]
+
+                cur_block += 1
+                if cur_block >= len(block_Q):
+                    done = True
+                else:
+                    cursor = block.Block(white, block_Q[cur_block], 0, 0)
+                    boundary = [0, 0, board.width() / 2, board.length()]
 
     # Set the screen background
     screen.fill(black)
@@ -102,7 +123,9 @@ while done == False:
         b.draw(screen, px_ratio)
 
     # Display white "cursor" block
-    cursor.draw(screen, px_ratio)
+    # Cursor should blink on top of current block
+    if pygame.time.get_ticks() % 1000 < 600:
+        cursor.draw(screen, px_ratio)
 
     # Text command below
     command = "BUILD PHASE: Player " + str(turn)
@@ -110,9 +133,9 @@ while done == False:
     screen.blit(text, (0, board.length() * px_ratio))
     command = "Use "
     if turn == 1:
-        command += "WASD to move and L-Shift to confirm"
+        command += "WASD to move, L-Shift to confirm"
     if turn == 2:
-        command += "Arrow Keys to move and Enter to confirm"
+        command += "Arrow Keys to move, Enter to confirm"
     text = myfont.render(command, 1, white)
     screen.blit(text, (0, board.length() * px_ratio + font_size))
 
@@ -127,4 +150,8 @@ while done == False:
 
 # Be IDLE friendly. If you forget this line, the program will 'hang'
 # on exit.
+if cur_block < len(block_Q):
+    pygame.quit()
+
+print "BUILD PHASE OVER!"
 pygame.quit()

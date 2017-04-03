@@ -2,6 +2,8 @@
 import pygame
 import block
 
+adj = {(0, 1), (0, -1), (1, 0), (-1, 0)}
+
 class Board:
     def __init__(self, width, length, colors):
         self.w = width
@@ -17,11 +19,21 @@ class Board:
         return self.l
 
     def place(self, block_type, owner, x, y):
-        # check if block conflicts
+        # Check if block conflicts
         for b in self.blocks:
             if b.pos() == (x, y):
                 return False
-        # TODO: check that placed block is adjacent to previously placed block
+
+        # Check that non-engine block is adjacent to some block of same owner
+        if block_type != block.Block.Engine:
+            adjacent = False
+            for b in self.blocks:
+                if (b.pos()[0] - x, b.pos()[1] - y) in adj:
+                    adjacent = True
+            if not adjacent:
+                return False
+
+        # Construct and add block to block list
         b = block.Block(self.colors[owner], block_type, x, y)
         self.blocks.append(b)
         return True
