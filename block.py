@@ -8,17 +8,11 @@ class Block:
         self.x = x
         self.y = y
 
-    def handle_keys(self):
-        key = pygame.key.get_pressed()
-        if key[pygame.K_DOWN]:
-            self.y += 1
-        elif key[pygame.K_UP]:
-            self.y -= 1
-        elif key[pygame.K_RIGHT]:
-            self.x += 1
-        elif key[pygame.K_LEFT]:
-            self.x -= 1
+    def move(self, d):
+        self.x += d[0]
+        self.y += d[1]
 
+    # only function in Block that knows about pixels
     def draw(self, screen, px_ratio):
         # draw a square with edge length size and upper left corner at (x, y)
         square = map(lambda x: x * px_ratio, [self.x, self.y, 1, 1])

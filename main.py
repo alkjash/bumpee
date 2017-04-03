@@ -48,13 +48,30 @@ turn = 1
 board.place(1, 1, 3, 2)
 board.place(1, 2, 2, 1)
 
+move_dict = {
+        (pygame.K_w,     1) : ( 0, -1),
+        (pygame.K_a,     1) : (-1,  0),
+        (pygame.K_s,     1) : ( 0,  1),
+        (pygame.K_d,     1) : ( 1,  0),
+        (pygame.K_UP,    2) : ( 0, -1),
+        (pygame.K_LEFT,  2) : (-1,  0),
+        (pygame.K_DOWN,  2) : ( 0,  1),
+        (pygame.K_RIGHT, 2) : ( 1,  0)
+            }
+
 while done == False:
     for event in pygame.event.get(): # User did something
         if event.type == pygame.QUIT: # If user clicked close
             done = True # Flag that we are done so we exit this loop
         elif event.type == pygame.KEYDOWN:
             print "You pressed {0}".format(event.key)
-            cursor.handle_keys()
+            key = event.key
+            if (key, turn) in move_dict:
+                cursor.move(move_dict[(key, turn)])
+            elif (key, turn) == (pygame.K_LSHIFT, 1):
+                turn = 2
+            elif (key, turn) == (pygame.K_RETURN, 2):
+                turn = 1
             # Handle Key Press
             # If key is WASD, move Player 1's current block
             # If key is Left Shift, place Player 1's current block
