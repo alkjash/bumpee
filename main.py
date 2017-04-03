@@ -1,13 +1,13 @@
 #! /usr/bin/env python
 import pygame
 import board
+import block
 
 # Define some colors
 black    = (   0,   0,   0)
 white    = ( 255, 255, 255)
 green    = (   0, 255,   0)
 red      = ( 255,   0,   0)
-
 
 # --------- Initialize Board State ----------
 pygame.init()
@@ -28,6 +28,9 @@ px_ratio = 50
 size=[board.width() * px_ratio, board.length() * px_ratio + px_ratio]
 screen=pygame.display.set_mode(size)
 
+# Construct a block
+block = block.Block(white, px_ratio)
+
 pygame.display.set_caption("Bumpee")
 
 # -------- BUILD Phase Loop -----------
@@ -46,15 +49,16 @@ while done == False:
             done = True # Flag that we are done so we exit this loop
         elif event.type == pygame.KEYDOWN:
             print "You pressed {0}".format(event.key)
+            block.handle_keys()
             # Handle Key Press
             # If key is WASD, move Player 1's current block
             # If key is Left Shift, place Player 1's current block
             # If key is LURD, move Player 2's current block
             # If key is Enter, place Player 2's current block
 
-
     # Set the screen background
     screen.fill(black)
+    block.draw(screen)
 
     # Limit to 20 frames per second
     clock.tick(20)
