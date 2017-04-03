@@ -8,6 +8,7 @@ black    = (   0,   0,   0)
 white    = ( 255, 255, 255)
 green    = (   0, 255,   0)
 red      = ( 255,   0,   0)
+blue     = (   0,   0, 255)
 
 # --------- Initialize Board State ----------
 pygame.init()
@@ -20,7 +21,7 @@ myfont = pygame.font.SysFont("monospace", font_size)
 pygame.key.set_repeat(500, 200)
 
 # Construct empty board object width x length
-board = board.Board(10, 5)
+board = board.Board(10, 5, (black, red, blue))
 
 # Set the height and width of the screen
 # Leave one row's worth of space at bottom for text
@@ -28,8 +29,8 @@ px_ratio = 50
 size=[board.width() * px_ratio, board.length() * px_ratio + px_ratio]
 screen=pygame.display.set_mode(size)
 
-# Construct a block
-block = block.Block(white, px_ratio)
+# Construct a cursor block
+cursor = block.Block(white, 0, 0, 0)
 
 pygame.display.set_caption("Bumpee")
 
@@ -43,13 +44,17 @@ done = False
 # Alternate between 1 and 2
 turn = 1
 
+# test
+board.place(1, 1, 3, 2)
+board.place(1, 2, 2, 1)
+
 while done == False:
     for event in pygame.event.get(): # User did something
         if event.type == pygame.QUIT: # If user clicked close
             done = True # Flag that we are done so we exit this loop
         elif event.type == pygame.KEYDOWN:
             print "You pressed {0}".format(event.key)
-            block.handle_keys()
+            cursor.handle_keys()
             # Handle Key Press
             # If key is WASD, move Player 1's current block
             # If key is Left Shift, place Player 1's current block
@@ -58,12 +63,18 @@ while done == False:
 
     # Set the screen background
     screen.fill(black)
-    block.draw(screen)
 
     # Limit to 20 frames per second
     clock.tick(20)
 
     # Display should have:
+    # Display blocks currently placed
+    for block in board.get_blocks():
+        block.draw(screen, px_ratio)
+
+    # Display white "cursor" block
+    cursor.draw(screen, px_ratio)
+
     # Text command below
     command = "BUILD PHASE: Player " + str(turn)
     text = myfont.render(command, 1, white)

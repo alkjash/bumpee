@@ -1,10 +1,13 @@
 # Board object stores current board state, all blocks currently on board
+import pygame
+import block
 
 class Board:
-    def __init__(self, width, length):
+    def __init__(self, width, length, colors):
         self.w = width
         self.l = length
-        self.arr = [[(0, 0) for i in range(self.w)] for j in range(self.l)]
+        self.colors = colors
+        self.blocks = []
         assert(width % 2 == 0) # board must be two equal halves
 
     def width(self):
@@ -14,4 +17,8 @@ class Board:
         return self.l
 
     def place(self, block_type, owner, x, y):
-        self.arr[x][y] = (block_type, owner)
+        b = block.Block(self.colors[owner], block_type, x, y)
+        self.blocks.append(b)
+
+    def get_blocks(self):
+        return self.blocks
