@@ -17,9 +17,11 @@ class Board:
         return self.l
 
     def place(self, block_type, owner, x, y):
+        # check if block conflicts
         for b in self.blocks:
             if b.pos() == (x, y):
                 return False
+        # TODO: check that placed block is adjacent to previously placed block
         b = block.Block(self.colors[owner], block_type, x, y)
         self.blocks.append(b)
         return True
