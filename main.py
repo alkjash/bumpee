@@ -11,6 +11,7 @@ red      = ( 255,   0,   0)
 
 # --------- Initialize Board State ----------
 pygame.init()
+myfont = pygame.font.SysFont("monospace", 15)
 
 # Construct empty board object width x length
 board = board.Board(10, 5)
@@ -29,6 +30,9 @@ clock=pygame.time.Clock()
 #Loop until the user clicks the close button.
 done = False
 
+label = myfont.render("BUILD PHASE", 1, red)
+screen.blit(label, (1, 1))
+
 while done == False:
     for event in pygame.event.get(): # User did something
         if event.type == pygame.QUIT: # If user clicked close
@@ -44,6 +48,7 @@ while done == False:
     clock.tick(20)
 
     # Go ahead and update the screen with what we've drawn.
+    screen.blit(label, (1, 1))
     pygame.display.flip()
 
 # Be IDLE friendly. If you forget this line, the program will 'hang'
