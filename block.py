@@ -8,9 +8,21 @@ class Block:
         self.x = x
         self.y = y
 
-    def move(self, d):
+    def move(self, d, boundary):
         self.x += d[0]
         self.y += d[1]
+        # move back within bounds if went out
+        if self.x < boundary[0]:
+            self.x = boundary[0]
+        elif self.y < boundary[1]:
+            self.y = boundary[1]
+        elif self.x >= boundary[2] + boundary[0]:
+            self.x = boundary[2] + boundary[0] - 1
+        elif self.y >= boundary[3] + boundary[1]:
+            self.y = boundary[3] + boundary[1] - 1
+
+    def pos(self):
+        return (self.x, self.y)
 
     # only function in Block that knows about pixels
     def draw(self, screen, px_ratio):
