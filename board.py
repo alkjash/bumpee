@@ -21,14 +21,14 @@ class Board:
     def place(self, block_type, owner, x, y):
         # Check if block conflicts
         for b in self.blocks:
-            if b.pos() == (x, y):
+            if (b.x, b.y) == (x, y):
                 return False
 
         # Check that non-engine block is adjacent to some block of same owner
         if block_type != block.Block.Engine:
             adjacent = False
             for b in self.blocks:
-                if (b.pos()[0] - x, b.pos()[1] - y) in adj:
+                if (b.x - x, b.y - y) in adj:
                     adjacent = True
             if not adjacent:
                 return False

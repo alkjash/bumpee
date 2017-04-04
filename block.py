@@ -32,9 +32,6 @@ class Block:
         elif self.y >= boundary[3] + boundary[1]:
             self.y = boundary[3] + boundary[1] - 1
 
-    def pos(self):
-        return (self.x, self.y)
-
     # only function in Block that knows about pixels
     def draw(self, screen, px_ratio):
         # draw a square with edge length size and upper left corner at (x, y)
