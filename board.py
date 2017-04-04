@@ -40,3 +40,37 @@ class Board:
 
     def get_blocks(self):
         return self.blocks
+
+    # Clear all blocks disconnected from respective engine
+    def clear_disconnected(self):
+        remove = [[True for i in range(self.length())] for j in range(self.width())]
+        # Find engines
+        engines = []
+        for i in range(len(self.blocks)):
+            b = self.blocks[i]
+            if b.type == block.Block.Engine:
+                remove[b.x][b.y] = False
+                engines.append(i)
+        for i in range(2):
+            cur = self.blocks[engines[i]]
+            done = False
+            prev = []
+            while not done:
+                # dfs for all adjacent same-color blocks
+                for b in self.blocks:
+                    if remove[b.x][b.y] == False or b.color != cur.color:
+                        continue
+                    if (b.x - cur.x, b.y - cur.y) in adj:
+                        prev.append(cur)
+                        cur = b
+                        done = False
+                        break
+                if remove[cur.x][cur.y] == True:
+                    remove[cur.x][cur.y] = False
+                elif prev != []:
+                    cur = prev.pop()
+                else:
+                    done = True
+        remove = [remove[b.x][b.y] for b in self.blocks]
+        self.blocks = [self.blocks[i] for i in range(len(self.blocks)) if not remove[i]]
+

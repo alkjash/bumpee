@@ -22,6 +22,9 @@ move_dict = {
         (pygame.K_RIGHT, 2) : ( 1,  0)
             }
 
+# FPS limit
+fps_limit = 40
+
 # --------- Initialize Board State ----------
 pygame.init()
 
@@ -86,7 +89,6 @@ while done == False:
         # If key is LURD, move Player 2's current block
         # If key is Enter, place Player 2's current block
         elif event.type == pygame.KEYDOWN:
-            print "You pressed {0}".format(event.key)
             key = event.key
             if (key, turn) in move_dict:
                 cursor.move(move_dict[(key, turn)], boundary)
@@ -114,8 +116,8 @@ while done == False:
     # Set the screen background
     screen.fill(black)
 
-    # Limit to 20 frames per second
-    clock.tick(20)
+    # Limit frames per second
+    clock.tick(fps_limit)
 
     # Display should have:
     # Display blocks currently placed
@@ -154,9 +156,7 @@ while done == False:
 if cur_block < len(block_Q):
     pygame.quit()
 
-print "BUILD PHASE OVER!"
 # -------- BUMP Phase Loop -----------
-print "BUMP PHASE START!"
 
 done = False
 
@@ -177,7 +177,6 @@ while done == False:
         # If key is LURD, move Player 2's entire car
         # If key is Enter, confirm Player 2's move
         elif event.type == pygame.KEYDOWN:
-            print "You pressed {0}".format(event.key)
             key = event.key
             if (key, turn) in move_dict:
                 next_move = move_dict[(key, turn)]
@@ -219,10 +218,10 @@ while done == False:
                         if (b1.x, b1.y) == (b.x, b.y):
                             remove[i] = True
                             remove[j] = True
-                blocks = [blocks[i] for i in range(len(blocks)) if not remove[i]]
+                board.blocks = [blocks[i] for i in range(len(blocks)) if not remove[i]]
                 # check win condition
                 win = 3
-                for b in blocks:
+                for b in board.get_blocks():
                     if (b.color, b.type) == (blue, block.Block.Engine):
                         win -= 2
                     elif (b.color, b.type) == (red, block.Block.Engine):
@@ -233,6 +232,9 @@ while done == False:
                         print "Tie!"
                     else:
                         print "Winner is " + str(win)
+                    break
+                # remove blocks disconnected from engine
+                board.clear_disconnected()
 
                 turn = turn % 2 + 1
                 cur_move = (0, 0)
@@ -240,8 +242,8 @@ while done == False:
     # Set the screen background
     screen.fill(black)
 
-    # Limit to 20 frames per second
-    clock.tick(20)
+    # Limit frames per second
+    clock.tick(fps_limit)
 
     # Display should have:
     # Display previous car position
@@ -257,13 +259,13 @@ while done == False:
                                     b.x + cur_move[0],
                                     b.y + cur_move[1])
                 # check within bounds
-                if b.x < boundary[0]:
+                if b_moved.x < boundary[0]:
                     continue
-                elif b.y < boundary[1]:
+                elif b_moved.y < boundary[1]:
                     continue
-                elif b.x >= boundary[2] + boundary[0]:
+                elif b_moved.x >= boundary[2] + boundary[0]:
                     continue
-                elif b.y >= boundary[3] + boundary[1]:
+                elif b_moved.y >= boundary[3] + boundary[1]:
                     continue
                 b_moved.draw(screen, px_ratio)
 
